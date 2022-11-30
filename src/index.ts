@@ -3,8 +3,6 @@ import fetch from 'node-fetch';
 import * as dotenv from "dotenv";
 import { join } from 'path';
 
-console.log(__filename);
-
 dotenv.config();
 
 const year = process.env.YEAR ?? new Date().getFullYear();
@@ -31,35 +29,24 @@ async function main() {
         dir = await fs.readdir(dayDirectoryPath);
     }
 
-    let hasInput = false;
-    let hasTask1 = false;
-    let hasTask2 = false
-
-    dir.forEach(file => {
-        if (file === "input.txt")
-            hasInput = true;
-        if (file === "task1.ts")
-            hasTask1 = true;
-        if (file === "task2.ts")
-            hasTask2 = true;
-    });
+    const hasInput = dir.includes("input.txt");
+    const hasTask1 = dir.includes("task1.ts");
+    const hasTask2 = dir.includes("task2.ts");
 
     if (!hasInput && sessionId) {
-        const response = await fetch(`https://adventofcode.com/${year}/day/${day}/input`, {
+        const text = await fetch(`https://adventofcode.com/${year}/day/${day}/input`, {
             headers: {
                 "cookie": `session=${sessionId}`
             }
-        });
-        const text = await response.text();
+        }).text();
         await fs.writeFile(`${dayDirectoryPath}/input.txt`, text);
     }
 
-    if (!hasTask1) {
+    if (!hasTask1)
         await fs.writeFile(`${dayDirectoryPath}/task1.ts`, defaultTask)
-    }
-    if (!hasTask2) {
+    if (!hasTask2)
         await fs.writeFile(`${dayDirectoryPath}/task2.ts`, defaultTask)
-    }
+
 
     const { default: task1 } = await import(`./${dayDirectory}/task1.ts`);
     const { default: task2 } = await import(`./${dayDirectory}/task2.ts`);
