@@ -1,9 +1,7 @@
 import { promises as fs } from 'fs';
-import { join } from 'path';
 
-export async function readLines(dirName: string): Promise<string[]> {
-    const file = await fs.readFile(join(dirName, "input.txt"))
+export async function readLines(fileName: string): Promise<string[]> {
+    const file = await fs.readFile(fileName)
     const content = file.toString().trim();
-    const lines = content.split("\n");
-    return lines;
+    return content.split(/\r?\n|\r/g);
 }
