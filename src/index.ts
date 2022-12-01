@@ -13,15 +13,16 @@ const dayDirectoryPath = join(__dirname, dayDirectory);
 
 const defaultTask = `import { readLines } from "../helper";
 
-async function run(){
+export async function runTask1(){
     const lines = await readLines(__dirname);
-    console.log(lines);
 }
 
-export default run;`
+export async function runTask2(){
+    const lines = await readLines(__dirname);
+}`
 
 async function main() {
-    let dir: string[] = []
+    let dir: string[];
     try {
         dir = await fs.readdir(dayDirectoryPath);
     } catch (_) {
@@ -30,8 +31,7 @@ async function main() {
     }
 
     const hasInput = dir.includes("input.txt");
-    const hasTask1 = dir.includes("task1.ts");
-    const hasTask2 = dir.includes("task2.ts");
+    const hasTask = dir.includes("task.ts");
 
     if (!hasInput && sessionId) {
         const text = await fetch(`https://adventofcode.com/${year}/day/${day}/input`, {
@@ -42,17 +42,14 @@ async function main() {
         await fs.writeFile(`${dayDirectoryPath}/input.txt`, text);
     }
 
-    if (!hasTask1)
-        await fs.writeFile(`${dayDirectoryPath}/task1.ts`, defaultTask)
-    if (!hasTask2)
-        await fs.writeFile(`${dayDirectoryPath}/task2.ts`, defaultTask)
+    if (!hasTask)
+        await fs.writeFile(`${dayDirectoryPath}/task.ts`, defaultTask)
 
 
-    const { default: task1 } = await import(`./${dayDirectory}/task1.ts`);
-    const { default: task2 } = await import(`./${dayDirectory}/task2.ts`);
+    const { default: task } = await import(`./${dayDirectory}/task1.ts`);
 
-    task1();
-    task2();
+    task.runTask1();
+    task.runTask2();
 }
 
-main();
+main().then();
